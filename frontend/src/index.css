@@ -1,0 +1,132 @@
+/* Import custom font - THIS MUST BE AT THE VERY TOP */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+body {
+  font-family: 'Inter', sans-serif;
+
+  /* 🌌 Dark Gradient Background */
+  background: radial-gradient(circle at top left, #1a1f2e, #0d0d15);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0;
+  color: #fff;
+  backdrop-filter: blur(3px);
+}
+
+/* Root container */
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Logo styling (optional demo) */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Chat bubble style overrides */
+.chat-bubble {
+  max-width: 75%;
+  padding: 0.5rem 1rem;
+  border-radius: 1.25rem;
+  word-break: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+.chat-user {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f1f1f1;
+  align-self: flex-end;
+}
+.chat-ai {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  align-self: flex-start;
+}
+
+/* Enhanced Input Styling - This ensures the white input appears correctly */
+.chat-input {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  color: #1f2937 !important;
+  border: 1px solid rgba(229, 231, 235, 0.8) !important;
+  border-radius: 1rem !important;
+  padding: 1rem 1.25rem !important;
+  font-size: 1rem !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.chat-input:focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  background-color: #ffffff !important;
+}
+
+.chat-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+.chat-input:hover {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+/* Message input transition */
+input:disabled {
+  background-color: #f3f4f6 !important;
+  cursor: not-allowed;
+  opacity: 0.7 !important;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Scrollbar customizations */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

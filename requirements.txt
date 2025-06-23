@@ -1,0 +1,12 @@
+ fastapi
+ uvicorn[standard]
+ python-dotenv
+ langgraph
+ requests
+pydantic
+starlette
+yfinance
+python-dateutil # For parsing dates from user input
+# langchain (if you plan to add LangChain LLMs or specific components later)
+# beautifulsoup4 (if needed for other tools, not currently used by weather/stock tools)
+# starlette (is a dependency of fastapi, usually not needed explicitly)
