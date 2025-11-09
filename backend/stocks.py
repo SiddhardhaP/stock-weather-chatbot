@@ -262,10 +262,10 @@ class StockTool:
 
 
 # This function will be imported by langgraph_core.py
-def get_stock_price(ticker_or_company_name: str, date_str: Optional[str] = None) -> str:
+def get_stock_price(ticker_or_company_name: str, date_str: Optional[str] = None) -> Dict[str, str]:
     """
     Fetches stock price for a given ticker/company name, optionally for a specific date or last week's average,
-    and formats it as a string.
+    and returns a structured dictionary.
     """
     try:
         if "." in ticker_or_company_name or ticker_or_company_name.isupper():
@@ -278,35 +278,38 @@ def get_stock_price(ticker_or_company_name: str, date_str: Optional[str] = None)
         company_display_name = stock_data.get("name", symbol)
         currency = stock_data.get("currency", "")
 
+        response_content = ""
         if stock_data.get("type") == "historical":
-            return (
-                f"On {stock_data['date']}, for {company_display_name} ({stock_data['symbol']}):\n"
-                f"  Open: {currency} {stock_data['open']}\n"
-                f"  High: {currency} {stock_data['high']}\n"
-                f"  Low: {currency} {stock_data['low']}\n"
-                f"  Close: {currency} {stock_data['close']}\n"
-                f"  Volume: {stock_data['volume']}"
+            response_content = (
+                f"📈 Here's the stock data for {company_display_name} ({stock_data['symbol']}) on {stock_data['date']}:\n"
+                f"  🔵 Open: {currency} {stock_data['open']}\n"
+                f"  🔼 High: {currency} {stock_data['high']}\n"
+                f"  🔽 Low: {currency} {stock_data['low']}\n"
+                f"  ⚫ Close: {currency} {stock_data['close']}\n"
+                f"  📊 Volume: {stock_data['volume']}"
             )
         elif stock_data.get("type") == "weekly_average":
-            return (
-                f"For last week ({stock_data['start_date']} to {stock_data['end_date']}), "
-                f"for {company_display_name} ({stock_data['symbol']}):\n"
-                f"  Average Closing Price: {currency} {stock_data['average_price']}\n"
-                f"  Lowest Price: {currency} {stock_data['min_price']}\n"
-                f"  Highest Price: {currency} {stock_data['max_price']}\n"
-                f"  Total Volume: {stock_data['total_volume']}"
+            response_content = (
+                f"📈 Here's the stock summary for {company_display_name} ({stock_data['symbol']}) for last week ({stock_data['start_date']} to {stock_data['end_date']}):\n"
+                f"  💵 Average Close: {currency} {stock_data['average_price']}\n"
+                f"  🔼 Week's High: {currency} {stock_data['max_price']}\n"
+                f"  🔽 Week's Low: {currency} {stock_data['min_price']}\n"
+                f"  📊 Total Volume: {stock_data['total_volume']}"
             )
         elif stock_data.get("type") == "current":
-            return (
-                f"The current price of {company_display_name} ({stock_data['symbol']}) is "
-                f"{currency} {stock_data['price']}. "
+            change_str = stock_data['change']
+            change_icon = "📈" if not change_str.startswith('-') else "📉"
+            response_content = (
+                f"{change_icon} For {company_display_name} ({stock_data['symbol']}), the current price is **{currency} {stock_data['price']}**. "
                 f"The daily change is {stock_data['change']} ({stock_data['change_percent']})."
             )
         else:
-            return f"Could not determine data type for {company_display_name}."
+            response_content = f"Could not determine data type for {company_display_name}."
+
+        return {"status": "success", "content": response_content}
 
     except ValueError as e:
-        return str(e)
+        return {"status": "error", "message": str(e)}
 
 
 if __name__ == "__main__":
@@ -330,8 +333,11 @@ if __name__ == "__main__":
                 elif date_input_str.lower() == "last week":
                     date_input_str = "last_week"
 
-                output_str = get_stock_price(company, date_input_str)
-                print(f"\n{output_str}\n")
+                output_dict = get_stock_price(company, date_input_str)
+                if output_dict["status"] == "success":
+                    print(f"\n{output_dict['content']}\n")
+                else:
+                    print(f"\n❌ Error: {output_dict['message']}\n")
 
             except ValueError as e_cli:
                 print(f"❌ Error: {e_cli}")

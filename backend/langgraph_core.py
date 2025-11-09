@@ -202,8 +202,9 @@ class WeatherStockAgent:
             elif has_core_stock_keyword:
                 decision = "stock"
             else:
-                 # Ambiguous tie, e.g., "yesterday's data" - default to weather? Or unknown?
-                 decision = "weather" # Could also be "unknown" depending on desired strictness
+                 # Ambiguous tie, e.g., "yesterday's data".
+                 # It's better to admit we don't know than to guess wrong.
+                 decision = "unknown"
         
         self._console_log_step("ROUTE_DECISION", {"message": f"Decision: {decision} (W: {weather_score}, S_Total: {total_stock_score})"})
         return decision
@@ -289,16 +290,17 @@ class WeatherStockAgent:
             self._console_log_step("STOCK_TOOL_INFO", {"message": f"Fetching stock data for {stock_query}..."})
             time.sleep(0.2) 
             
-            result_from_tool = self._retry_with_backoff(get_stock_price, stock_query, date_str) 
+            tool_response = self._retry_with_backoff(get_stock_price, stock_query, date_str) 
             self._console_log_step("STOCK_TOOL_INFO", {"message": "Processing stock data..."})
             time.sleep(0.1) 
             
-            if "failed" in result_from_tool.lower() or "error" in result_from_tool.lower() or "unavailable" in result_from_tool.lower():
-                self._console_log_step("STOCK_TOOL_ERROR", {"message": f"Stock tool reported: {result_from_tool}"})
-                state['result'] = f"Sorry, I couldn't fetch the stock information for '{stock_query}'. The tool said: {result_from_tool}"
+            if tool_response.get("status") == "error":
+                error_message = tool_response.get('message', 'An unknown error occurred in the stock tool.')
+                self._console_log_step("STOCK_TOOL_ERROR", {"message": f"Stock tool reported: {error_message}"})
+                state['result'] = f"Sorry, I couldn't fetch the stock information for '{stock_query}'. The tool said: {error_message}"
             else:
                 self._console_log_step("STOCK_TOOL_SUCCESS", {"message": "Stock data processed successfully!"})
-                state['result'] = result_from_tool 
+                state['result'] = tool_response.get('content', 'No content received from the stock tool.')
             
             state['tool_used'] = 'stock'
             self._save_to_memory('stock', stock_query, date_str) 
@@ -316,10 +318,7 @@ class WeatherStockAgent:
         if not state.get('result'):
             state['result'] = "I'm sorry, I couldn't understand your request. I can help you with:\n" \
                              "• Weather information (e.g., 'weather in Chennai', 'weather tomorrow', 'weather yesterday')\n" \
-                             "• Stock prices (e.g., 'price of Google stock', 'Amazon share price on June 5', 'Apple stock last week')\n" \
-                             "\nI also remember context from our conversation, so you can say things like:\n" \
-                             "• 'What about tomorrow there?' (after asking about weather)\n" \
-                             "• 'How is that stock doing?' (after asking about a stock)"
+                             "• Stock prices (e.g., 'price of Google stock', 'Amazon share price on June 5', 'Apple stock last week')"
         
         self._console_log_step("FINALIZING", {"message": "Finalizing response..."})
         time.sleep(0.1) 

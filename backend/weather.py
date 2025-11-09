@@ -262,13 +262,28 @@ def get_weather_info(location: str, day: str = "today") -> str: # Added day para
     tool = WeatherTool()
     try:
         weather_data = tool.get_weather(location, day) # Use the new get_weather method
-        # Format the dictionary into a natural language string for the agent
-        # Adjust wind speed unit in the output string if necessary (Visual Crossing uses km/h for metric)
-        return (
-            f"For {weather_data['day']} in {weather_data['city']}, the weather is {weather_data['description']} "
-            f"with a temperature of {weather_data['temperature']} (feels like {weather_data['feels_like']}). "
-            f"Humidity is at {weather_data['humidity']} and wind speed is {weather_data['wind_speed']}."
-        )
+        day_info = weather_data['day']
+        city_name = weather_data['city']
+
+        if "Last Week" in day_info:
+            # Specific format for weekly summary
+            return (
+                f"Here's the weather summary for {day_info} in {city_name}:\n"
+                f"  🌡️ Average Temperature: {weather_data['temperature']}\n"
+                f"  🤔 Average Feels Like: {weather_data['feels_like']}\n"
+                f"  💧 Average Humidity: {weather_data['humidity']}\n"
+                f"  💨 Average Wind Speed: {weather_data['wind_speed']}\n"
+                f"  ☁️ Conditions were varied, for example: {weather_data['description']}"
+            )
+        else:
+            # Format for single day (today, tomorrow, yesterday, specific date)
+            return (
+                f"Here is the weather for {day_info} in {city_name}:\n"
+                f"  🌡️ Temperature: {weather_data['temperature']} (feels like {weather_data['feels_like']})\n"
+                f"  ☁️ Conditions: {weather_data['description']}\n"
+                f"  💧 Humidity: {weather_data['humidity']}\n"
+                f"  💨 Wind Speed: {weather_data['wind_speed']}"
+            )
     except ValueError as e:
         return str(e) # Return the error message as a string
     except Exception as e:
